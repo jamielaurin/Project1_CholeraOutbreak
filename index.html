@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Jamie Laurin Project1</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<div class="container pt-5 text-center">
+
+  <div id="header" class="py-4">
+    <h1>Project 1: 1854 London Cholera Outbreak</h1>
+
+    <div class="text-end"><h5>Jamie Laurin</h5>
+      <a href="https://jamielaurin.github.io/">https://jamielaurin.github.io/</a>
+      <div>jlaurin8@hawaii.edu</div>
+    </div>
+  </div>
+
+
+  <div class="d-flex justify-content-center" id="myTable"></div>
+  <div id="myLine" ></div>
+
+  <div class="d-flex justify-content-center" id="table2"></div>
+  <div id="myBar"></div>
+  <div class="d-flex justify-content-center" id="table3" style="width: 100%"></div>
+  <div id="bar2" style="width:100%"></div>
+
+  <div class="row">
+    <div class="col" id="pieMen" style="width:100%"></div>
+    <div class="col" id="pieWomen" style="width:100%"></div>
+  </div>
+
+  <div class="d-flex justify-content-center" id="pieBoth" style="width:100%"></div>
+
+
+  <div id="myMap" style="width:100%"></div>
+
+
+  <footer>
+    <div class="container py-4">
+      <div class="row">
+        <div class="col">
+          RESOURCES
+          <hr/>
+          <div>About Us</div>
+          <div>Employment</div>
+          <div>Videos</div>
+        </div>
+        <div class="col">
+          CONNECT
+          <hr/>
+          <div>Sign up for the latest updates</div>
+          <label>
+            <input type="text" placeholder="Enter Email Address"/>
+          </label>
+          <button type="button" class="btn btn-dark">Join</button>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+
+
+  <div id="chart-codes">
+    <script id="table">
+      Plotly.d3.csv("choleraDeaths.csv", function(err, rows){
+
+        function unpack(rows, key) {
+          return rows.map(function(row) { return row[key]; });
+        }
+
+        var headerNames = Plotly.d3.keys(rows[0]);
+
+        var headerValues = [];
+        var cellValues = [];
+        for (i = 0; i < headerNames.length; i++) {
+          headerValue = [headerNames[i]];
+          headerValues[i] = headerValue;
+          cellValue = unpack(rows, headerNames[i]);
+          cellValues[i] = cellValue;
+        }
+
+        // clean date
+        for (i = 0; i < cellValues[1].length; i++) {
+          var dateValue = cellValues[1][i].split(' ')[0]
+          cellValues[1][i] = dateValue
+        }
+
+        var data = [{
+          type: 'table',
+          columnwidth: [200,300,300,300,300,300,300,300,300],
+          columnorder: [0,1,2,3,4,5,6,7,8,9],
+          header: {
+            values: headerValues,
+            align: "center",
+            line: {width: 1, color: 'rgb(50, 50, 50)'},
+            fill: {color: ['rgb(235, 100, 230)']},
+            font: {family: "Arial", size: 11, color: "white"}
+          },
+          cells: {
+            values: cellValues,
+            align: ["center", "center"],
+            line: {color: "black", width: 1},
+            fill: {color: ['rgba(228, 222, 249, 0.65)','rgb(235, 193, 238)', 'rgba(228, 222, 249, 0.65)']},
+            font: {family: "Arial", size: 10, color: ["black"]}
+          }
+        }]
+
+        var layout = {
+          title: "Cholera Attacks & Deaths",
+          height: 600,
+          width: 800,
+        }
+
+        Plotly.plot('myTable', data, layout, {showSendToCloud: true});
+      });
+    </script>
+
+
+    <script id="Line Chart">
+     const CSV = "choleraDeaths.csv";
+
+      function plotFromCSV() {
+        Plotly.d3.csv(CSV, function(err, rows) {
+          console.log(rows);
+          processData(rows);
+        });
+      }
+
+      function processData(allRows) {
+        let x = [];
+        let y1 = [];
+        let y2 = [];
+        let y3 = [];
+        let y4 = [];
+        let row;
+
+        let i = 0;
+        while (i < allRows.length) {
+          row = allRows[i];
+          x.push(row["Date"]);
+          y1.push(row["Attack"]);
+          y2.push(row["Death"]);
+          y3.push(row["Total Attacks"]);
+          y4.push(row["Total Deaths"]);
+          i += 1;
+        }
+
+        console.log("X", x);
+        console.log("Y1", y1);
+
+        makePlotly(x, y1, y2, y3, y4);
+      }
+
+      function makePlotly(x, y1, y2, y3, y4) {
+        let traces = [
+          {
+            x: x,
+            y: y1,
+            name: "Attack",
+            line: {
+              color: "#387fba",
+              width: 3
+            }
+          },
+          {
+            x: x,
+            y: y2,
+            name: "Death",
+            line: {
+              color: "#54ba38",
+              width: 3,
+            }
+          },
+          {
+            x: x,
+            y: y3,
+            name: "Total Attacks",
+            line: {
+              color: "purple",
+              width: 3
+            }
+          },
+          {
+            x: x,
+            y: y4,
+            name: "Total Deaths",
+            line: {
+              color: "orange",
+              width: 3
+            }
+          }
+        ];
+
+        let layout = {
+          title: "Basic Line Chart",
+          yaxis: {
+            range: [0, 700]
+          },
+          xaxis: {
+          },
+        };
+
+        let config = {
+          responsive: true,
+        };
+        Plotly.newPlot("myLine", traces, layout, config);
+      }
+
+      plotFromCSV();
+
+    </script>
+
+    <script id="table-2">
+      Plotly.d3.csv("naplesCholeraAgeSexData.csv", function(err, rows){
+
+        function unpack(rows, key) {
+          return rows.map(function(row) { return row[key]; });
+        }
+
+        var headerNames = Plotly.d3.keys(rows[0]);
+
+        var headerValues = [];
+        var cellValues = [];
+        for (i = 0; i < headerNames.length; i++) {
+          headerValue = [headerNames[i]];
+          headerValues[i] = headerValue;
+          cellValue = unpack(rows, headerNames[i]);
+          cellValues[i] = cellValue;
+        }
+
+        // clean date
+        for (i = 0; i < cellValues[1].length; i++) {
+          var dateValue = cellValues[1][i].split(' ')[0]
+          cellValues[1][i] = dateValue
+        }
+
+        var data = [{
+          type: 'table',
+          columnwidth: [200,500,600,600,400,400,600,600,600],
+          columnorder: [0,1,2,3,4,5,6,7,8,9],
+          header: {
+            values: headerValues,
+            align: "center",
+            line: {width: 1, color: 'rgb(50, 50, 50)'},
+            fill: {color: ['rgb(235, 100, 230)']},
+            font: {family: "Arial", size: 11, color: "white"}
+          },
+          cells: {
+            values: cellValues,
+            align: ["center", "center"],
+            line: {color: "black", width: 1},
+            fill: {color: ['rgba(228, 222, 249, 0.65)','rgb(235, 193, 238)', 'rgba(228, 222, 249, 0.65)']},
+            font: {family: "Arial", size: 10, color: ["black"]}
+          }
+        }]
+
+        var layout = {
+          title: "TITLE",
+          height: 400,
+          width: 800,
+        }
+
+        Plotly.plot('table2', data, layout, {showSendToCloud: true});
+      });
+    </script>
+
+    <script id="bar">
+      var trace1 = {
+        x: ['0-1', '2-5', '6-10', '11-15', '16-20', '21-40','41-60', '61-80','over 80'],
+        y: [8.2,14.0,11.2,7.1,7.2,11.8,12.9,20.5,37.8],
+        name: 'Male',
+        type: 'bar'
+      };
+
+      var trace2 = {
+        x: ['0-1', '2-5', '6-10', '11-15', '16-20', '21-40','41-60', '61-80','over 80'],
+        y: [8.9,14.7,12.1,7.8,7.2,12.1,13.7,20.5,39.6],
+        name: 'Female',
+        type: 'bar'
+      };
+
+      var data = [trace1, trace2];
+      var layout = {
+        title: "TITLE",
+        barmode: 'group'
+      };
+
+      Plotly.newPlot('myBar', data, layout);
+
+    </script>
+
+    <script id="table-3">
+      var values = [
+        ['0-1', '2-5', '6-10', '11-15', '16-20', '21-40','41-60', '61-80','over 80', '<b>TOTAL</b>'],
+        ['2,075,391','1,711,664','1,395,091','1,073,914','810,979','560,534','351,893','166,194','40,772','<b>8,186,432</b>'],
+        ['2,065,096','1,711,627','1,542,876','1,140,383','845,260','592,970','399,019','199,326','55,704','<b>8,552,261</b>']
+      ]
+      var data = [{
+        type: 'table',
+        header: {
+          values: [["<b>Age</b>"], ["<b>Male</b>"],
+            ["<b>Female</b>"]],
+          align: "center",
+          line: {width: 1, color: 'black'},
+          fill: {color: "grey"},
+          font: {family: "Arial", size: 12, color: "white"}
+        },
+        cells: {
+          values: values,
+          align: "center",
+          line: {color: "black", width: 1},
+          font: {family: "Arial", size: 11, color: ["black"]}
+        }
+      }]
+
+      Plotly.newPlot('table3', data);
+
+    </script>
+
+    <script id="bar-2">
+      var trace1 = {
+        x: ['0-1', '2-5', '6-10', '11-15', '16-20', '21-40','41-60', '61-80','over 80'],
+        y: ['2,075,391','1,711,664','1,395,091','1,073,914','810,979','560,534','351,893','166,194','40,772'],
+        name: 'Male',
+        type: 'bar'
+      };
+
+      var trace2 = {
+        x: ['0-1', '2-5', '6-10', '11-15', '16-20', '21-40','41-60', '61-80','over 80'],
+        y: ['2,065,096','1,711,627','1,542,876','1,140,383','845,260','592,970','399,019','199,326','55,704'],
+        name: 'Female',
+        type: 'bar'
+      };
+
+      var data = [trace1, trace2];
+      var layout = { barmode: 'group' };
+
+      Plotly.newPlot('bar2', data, layout);
+
+    </script>
+
+    <script id="pie-men">
+      var data = [{
+        values: [2075391, 1711664,1395091,1073914,810979,560534,351893,166194,40772],
+        labels: ['0-1', '2-5', '6-10', '11-15', '16-20', '21-40','41-60', '61-80','over 80'],
+        type: 'pie'
+      }];
+
+      var layout = {
+        title: 'Male',
+        height: 400,
+        width: 500
+      };
+
+      Plotly.newPlot('pieMen', data, layout);
+    </script>
+    <script id="pie-women">
+      var data = [{
+        values: [2065096,1711627,1542876,1140383,845260,592970,399019,199326,55704],
+        labels: ['0-1', '2-5', '6-10', '11-15', '16-20', '21-40','41-60', '61-80','over 80'],
+        type: 'pie'
+      }];
+
+      var layout = {
+        title: 'Female',
+        height: 400,
+        width: 500
+      };
+
+      Plotly.newPlot('pieWomen', data, layout);
+    </script>
+    <script id="pie-both">
+      var data = [{
+        values: [8186432, 8552261],
+        labels: ['Men', 'Female'],
+        type: 'pie'
+      }];
+
+      var layout = {
+        title: 'Male vs Female',
+        height: 400,
+        width: 500
+      };
+
+      Plotly.newPlot('pieBoth', data, layout);
+    </script>
+
+    <script id="map">
+
+      var data= [{
+        name:'Water Pump',
+        type:'scattermapbox',
+        lat:['51.513341','51.513876','51.514906','51.512354','51.512139','51.511542','51.510019','51.511295'],
+        lon:['-0.136668','-0.139586','-0.139671','-0.13163','-0.133594','-0.135919','-0.133962','-0.138199'],
+        mode:'markers',
+        marker: {
+          size:14
+        },
+        text:['Water Pump']
+      },
+        {
+          name:'Deaths',
+          type:'scattermapbox',
+          lat:['51.513341'],
+          lon:['-0.136668'],
+          mode:'markers',
+          marker: {
+            size:14,
+            color:"red"
+          },
+          text:['']
+        }
+      ]
+
+      var layout = {
+        autosize: true,
+        hovermode:'closest',
+        mapbox: {
+          bearing:0,
+          center: {
+            lat:51.513341,
+            lon:-0.136668
+          },
+          pitch:0,
+          zoom:12
+        },
+      }
+
+      Plotly.setPlotConfig({
+        mapboxAccessToken: "pk.eyJ1IjoiamxhdXJpbjgiLCJhIjoiY2w4djZvOHh1MGF0MDNvbXYyMms3bnJ2diJ9.5eYv22I1Fs4fo75OaH8CIQ"
+      })
+
+      Plotly.newPlot('myMap', data, layout)
+
+    </script>
+  </div>
+
+</div>
+</body>
+</html>
